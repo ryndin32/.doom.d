@@ -24,14 +24,11 @@
 
 ;;; UI
 
-(setq doom-font (font-spec :family "Ubuntu Mono" :size (if IS-LINUX 20 17)))
-(setq doom-variable-pitch-font (font-spec :family "Ubuntu" :size (if IS-LINUX 18 15)))
-(setq doom-theme (if IS-LINUX 'doom-one 'doom-one-light))
+(setq doom-font (font-spec :family "Monaco" :size 14))
+(setq doom-variable-pitch-font (font-spec :family "Helvetica" :size 14))
+(setq doom-theme 'doom-one-light)
 (setq display-line-numbers-type t)
-(unless IS-MAC
-  (add-to-list 'default-frame-alist '(undecorated . t)))
-(if IS-LINUX (add-hook! 'doom-init-ui-hook #'v-center-frame)
-  (add-to-list 'initial-frame-alist '(fullscreen . maximized)))
+(add-hook! 'doom-init-ui-hook #'v-center-frame)
 
 
 
@@ -140,7 +137,6 @@
         (string= file ".venv")
         (string= file "node_modules")))
   (push #'treemacs-custom-filter treemacs-ignored-file-predicates))
-(add-hook 'treemacs-mode-hook (lambda () (setq tab-width 2)))
 
 ;; term
 (setq vterm-shell (cond (IS-LINUX "/usr/bin/fish")
