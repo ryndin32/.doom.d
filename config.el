@@ -7,9 +7,8 @@
 
 (after! projectile
   (setq projectile-track-known-projects-automatically nil)
-  (pushnew! projectile-project-search-path "~/Documents/Projects")
-  (pushnew! projectile-project-root-files ".envrc")
-  (pushnew! projectile-project-root-files "pyproject.toml")
+  (setq projectile-project-search-path '("~/Documents/Projects" "~/Documents/Projects/horatius/services"))
+  (pushnew! projectile-project-root-files ".envrc" "pyproject.toml")
   (pushnew! projectile-globally-ignored-directories
             ".vscode"
             ".idea"
