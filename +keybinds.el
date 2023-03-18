@@ -5,9 +5,6 @@
   "m" #'toggle-frame-maximized
   "v" #'v-term
   "c" #'v-center-frame
-  ;; "r" (cmd!
-  ;;      (envrc-allow)
-  ;;      (lsp-workspace-restart nil))
   "t" #'v-toggle-theme
   "k" (cmd! (load! "+keybinds.el")))
 
@@ -19,11 +16,11 @@
  :i "C-v" #'yank
  :i "C-z" #'undo
 
- (:when (featurep! :ui workspaces)
-  :n "] TAB" #'+workspace/switch-right
-  :n "[ TAB" #'+workspace/switch-left)
+ (:when (modulep! :ui workspaces)
+   :n "] TAB" #'+workspace/switch-right
+   :n "[ TAB" #'+workspace/switch-left)
 
- (:when (featurep! :tools pdf)
+ (:when (modulep! :tools pdf)
    :map pdf-view-mode-map
    ;; might conflict with undo functionality
    :n "d" #'pdf-view-scroll-up-or-next-page
@@ -49,22 +46,22 @@
 
  (:map (evil-ex-completion-map
         evil-ex-search-keymap)
-  "C-v" #'yank)
+       "C-v" #'yank)
 
  (:map vertico-map
-  "C-h" #'vertico-directory-delete-char
-  "C-l" #'vertico-directory-enter)
+       "C-h" #'vertico-directory-delete-char
+       "C-l" #'vertico-directory-enter)
 
  (:map treemacs-mode-map
-  "p" #'treemacs-peek
-  [mouse-1] #'treemacs-single-click-expand-action
-  (:when (featurep! :ui workspaces)
-   ;; "gt" #'+workspace:switch-next
-   ;; "gT" #'+workspace:switch-previous
-   "]w" #'+workspace/switch-right
-   "[w" #'+workspace/switch-left
-   "] TAB" #'+workspace/switch-right
-   "[ TAB" #'+workspace/switch-left))
+       "p" #'treemacs-peek
+       [mouse-1] #'treemacs-single-click-expand-action
+       (:when (modulep! :ui workspaces)
+         ;; "gt" #'+workspace:switch-next
+         ;; "gT" #'+workspace:switch-previous
+         "]w" #'+workspace/switch-right
+         "[w" #'+workspace/switch-left
+         "] TAB" #'+workspace/switch-right
+         "[ TAB" #'+workspace/switch-left))
 
  (:after elfeed
   :map elfeed-search-mode-map
@@ -90,25 +87,25 @@
   :i  "C-x" #'vterm-send-C-x
   :i  "C-v" #'yank
   :i  "C-c" (cmd! (if mark-active
-                     (call-interactively #'kill-ring-save)
-                   (call-interactively #'vterm-send-C-c))))
+                      (call-interactively #'kill-ring-save)
+                    (call-interactively #'vterm-send-C-c))))
 
  ;; TODO check spacemacs' `auto-completion-complete-with-key-sequence'
  :i "C-;" (cmds! (not (minibufferp)) #'+company/complete)
  (:after company
-  (:map company-active-map
-   "C-;" #'company-show-doc-buffer
-   "C-h" #'company-abort
-   "C-j" #'company-select-next
-   "C-k" #'company-select-previous
-   "C-l" #'company-complete-selection
-   "TAB" #'company-complete-selection
-   [tab] #'company-complete-selection)
-   ;; "RET" nil
-   ;; [return] nil)
-  (:map company-search-map
-   "C-;" #'company-show-doc-buffer
-   "C-h" #'company-search-abort))
+         (:map company-active-map
+               "C-;" #'company-show-doc-buffer
+               "C-h" #'company-abort
+               "C-j" #'company-select-next
+               "C-k" #'company-select-previous
+               "C-l" #'company-complete-selection
+               "TAB" #'company-complete-selection
+               [tab] #'company-complete-selection)
+         ;; "RET" nil
+         ;; [return] nil)
+         (:map company-search-map
+               "C-;" #'company-show-doc-buffer
+               "C-h" #'company-search-abort))
 
  (:leader
   "1" #'winum-select-window-1
