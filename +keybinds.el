@@ -23,6 +23,12 @@
   :n "] TAB" #'+workspace/switch-right
   :n "[ TAB" #'+workspace/switch-left)
 
+ (:when (featurep! :tools pdf)
+   :map pdf-view-mode-map
+   ;; might conflict with undo functionality
+   :n "d" #'pdf-view-scroll-up-or-next-page
+   :n "u" #'pdf-view-scroll-down-or-previous-page)
+
  (:textobj "b" #'evil-textobj-anyblock-inner-block #'evil-textobj-anyblock-a-block
   :textobj "B" #'evil-inner-paren #'evil-a-paren)
 
