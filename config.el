@@ -26,6 +26,13 @@
 (setq doom-font (font-spec :family "Monaco" :size 14))
 (setq doom-variable-pitch-font (font-spec :family "Helvetica" :size 14))
 (setq doom-theme 'doom-one-light)
+(setq doom-themes-enable-italic nil)
+(set-face-italic 'italic nil)
+(mapc
+ (lambda (face)
+   (when (eq (face-attribute face :slant) 'italic)
+     (set-face-attribute face nil :slant 'normal)))
+ (face-list))
 (setq display-line-numbers-type t)
 (add-hook! 'doom-init-ui-hook #'v-center-frame)
 
@@ -80,6 +87,9 @@
       lsp-ui-sideline-enable nil)
 (add-hook! 'lsp-after-initialize-hook
   (run-hooks (intern (format "%s-lsp-hook" major-mode))))
+
+;; rust
+(after! rustic (set-face-attribute 'rust-string-interpolation nil :slant 'normal))
 
 ;; web
 (setq emmet-self-closing-tag-style " /")
