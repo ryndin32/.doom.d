@@ -7,7 +7,13 @@
   "Command to initialize the jupyter REPL for `+python/open-jupyter-repl'.")
 
 (after! projectile
-  (pushnew! projectile-project-root-files "setup.py" "requirements.txt"))
+  (pushnew! projectile-project-root-files "pyproject.toml" "setup.py" "requirements.txt")
+  (pushnew! projectile-globally-ignored-directories
+            "*.mypy_cache"
+            "*.pytest_cache"
+            "*.ruff_cache"
+            "*.venv"
+            "*__pycache__"))
 
 
 ;;
@@ -19,28 +25,28 @@
   :init
   (setq python-environment-directory doom-cache-dir
         python-indent-guess-indent-offset-verbose nil)
-  (when (featurep! +lsp) (add-hook 'python-mode-local-vars-hook #'lsp!))
+  (when (modulep! +lsp) (add-hook 'python-mode-local-vars-hook #'lsp!))
   :config
   (set-repl-handler! 'python-mode #'+python/open-repl :persist t)
   (set-docsets! '(python-mode inferior-python-mode) "Python 3" "NumPy" "SciPy" "Pandas")
 
   (set-ligatures! 'python-mode
-    ;; Functional
-    :def "def"
-    :lambda "lambda"
-    ;; Types
-    :null "None"
-    :true "True" :false "False"
-    :int "int" :str "str"
-    :float "float"
-    :bool "bool"
-    :tuple "tuple"
-    ;; Flow
-    :not "not"
-    :in "in" :not-in "not in"
-    :and "and" :or "or"
-    :for "for"
-    :return "return" :yield "yield")
+                  ;; Functional
+                  :def "def"
+                  :lambda "lambda"
+                  ;; Types
+                  :null "None"
+                  :true "True" :false "False"
+                  :int "int" :str "str"
+                  :float "float"
+                  :bool "bool"
+                  :tuple "tuple"
+                  ;; Flow
+                  :not "not"
+                  :in "in" :not-in "not in"
+                  :and "and" :or "or"
+                  :for "for"
+                  :return "return" :yield "yield")
 
   ;; Stop the spam!
   (setq python-indent-guess-indent-offset-verbose nil)
@@ -72,17 +78,38 @@
 
   (setq-hook! 'python-mode-hook tab-width python-indent-offset)
 
+  (flycheck-define-checker python-ruff
+    nil
+    :command ("ruff"
+              "--format=text"
+              (eval (when buffer-file-name
+                      (concat "--stdin-filename=" buffer-file-name)))
+              "-")
+    :standard-input t
+    :error-filter (lambda (errors)
+                    (let ((errors (flycheck-sanitize-errors errors)))
+                      (seq-map #'flycheck-flake8-fix-error-level errors)))
+    :error-patterns
+    ((warning line-start
+              (file-name) ":" line ":" (optional column ":") " "
+              (id (one-or-more (any alpha)) (one-or-more digit)) " "
+              (message (one-or-more not-newline))
+              line-end))
+    :modes python-mode)
+  (add-to-list 'flycheck-checkers 'python-ruff)
+
   ;; Personal
   (setq python-indent-def-block-scale 1)
   (add-hook! 'python-mode-lsp-hook
-             ;; (flycheck-select-checker 'python-flake8)
-             ;; (flycheck-add-next-checker 'lsp 'python-flake8)
-             (setq-default flycheck-checker 'python-flake8)
-             (setq-default flycheck-disabled-checkers
-                           (pushnew! flycheck-disabled-checkers
-                                     'lsp
-                                     'python-mypy
-                                     'python-pycompile))))
+    (setq-default flycheck-checker nil)
+    ;; (flycheck-select-checker 'python-flake8)
+    ;; (flycheck-add-next-checker 'lsp 'python-flake8)
+    (setq lsp-diagnostics-provider :none)
+    (setq-default flycheck-disabled-checkers
+                  (pushnew! flycheck-disabled-checkers
+                            'lsp
+                            'python-mypy
+                            'python-pycompile))))
 
 
 (use-package! pyimport
@@ -92,9 +119,9 @@
         :map python-mode-map
         :localleader
         (:prefix ("i" . "imports")
-          :desc "Insert missing imports" "i" #'pyimport-insert-missing
-          :desc "Remove unused imports"  "r" #'pyimport-remove-unused
-          :desc "Optimize imports"       "o" #'+python/optimize-imports)))
+         :desc "Insert missing imports" "i" #'pyimport-insert-missing
+         :desc "Remove unused imports"  "r" #'pyimport-remove-unused
+         :desc "Optimize imports"       "o" #'+python/optimize-imports)))
 
 
 (use-package! py-isort
@@ -104,8 +131,8 @@
         :map python-mode-map
         :localleader
         (:prefix ("i" . "imports")
-          :desc "Sort imports"      "s" #'py-isort-buffer
-          :desc "Sort region"       "S" #'py-isort-region)))
+         :desc "Sort imports"      "s" #'py-isort-buffer
+         :desc "Sort region"       "S" #'py-isort-region)))
 
 
 (use-package! python-pytest
