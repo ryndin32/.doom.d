@@ -70,13 +70,20 @@
         (setq-local flycheck-python-pylint-executable "pylint")
         (setq-local flycheck-python-flake8-executable "flake8"))))
 
-  (define-key python-mode-map (kbd "DEL") nil) ; interferes with smartparens
-  (sp-local-pair 'python-mode "'" nil
-                 :unless '(sp-point-before-word-p
-                           sp-point-after-word-p
-                           sp-point-before-same-p))
-
   (setq-hook! 'python-mode-hook tab-width python-indent-offset)
+
+  ;; Personal
+  (setq python-indent-def-block-scale 1)
+  (add-hook! 'python-mode-lsp-hook
+    (setq-default flycheck-checker nil)
+    ;; (flycheck-select-checker 'python-flake8)
+    ;; (flycheck-add-next-checker 'lsp 'python-flake8)
+    (setq lsp-diagnostics-provider :none)
+    (setq-default flycheck-disabled-checkers
+                  (pushnew! flycheck-disabled-checkers
+                            'lsp
+                            'python-mypy
+                            'python-pycompile)))
 
   (flycheck-define-checker python-ruff
     nil
@@ -96,20 +103,7 @@
               (message (one-or-more not-newline))
               line-end))
     :modes python-mode)
-  (add-to-list 'flycheck-checkers 'python-ruff)
-
-  ;; Personal
-  (setq python-indent-def-block-scale 1)
-  (add-hook! 'python-mode-lsp-hook
-    (setq-default flycheck-checker nil)
-    ;; (flycheck-select-checker 'python-flake8)
-    ;; (flycheck-add-next-checker 'lsp 'python-flake8)
-    (setq lsp-diagnostics-provider :none)
-    (setq-default flycheck-disabled-checkers
-                  (pushnew! flycheck-disabled-checkers
-                            'lsp
-                            'python-mypy
-                            'python-pycompile))))
+  (add-to-list 'flycheck-checkers 'python-ruff))
 
 
 (use-package! pyimport
@@ -135,27 +129,10 @@
          :desc "Sort region"       "S" #'py-isort-region)))
 
 
-(use-package! python-pytest
-  :commands python-pytest-dispatch
-  :init
-  (map! :after python
-        :localleader
-        :map python-mode-map
-        :prefix ("t" . "test")
-        "a" #'python-pytest
-        "f" #'python-pytest-file-dwim
-        "F" #'python-pytest-file
-        "t" #'python-pytest-function-dwim
-        "T" #'python-pytest-function
-        "r" #'python-pytest-repeat
-        "p" #'python-pytest-dispatch))
-
-
 ;;
 ;;; LSP
 
 (use-package! lsp-pyright
-  ;; :when (featurep! +pyright)
   :after lsp-mode
   :init
   (setq lsp-pyright-multi-root nil

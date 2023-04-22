@@ -19,14 +19,6 @@
 (setq scroll-margin 5)
 (add-hook! 'doom-init-ui-hook #'v-center-frame)
 
-(setq doom-themes-enable-italic nil)
-(set-face-italic 'italic nil)
-(mapc
- (lambda (face)
-   (when (eq (face-attribute face :slant) 'italic)
-     (set-face-attribute face nil :slant 'normal)))
- (face-list))
-
 
 ;;
 ;;; Keybinds
@@ -86,7 +78,7 @@
 (setq typescript-indent-level 2)
 (add-hook 'js-mode-hook (lambda () (setq js-indent-level 2)))
 (after! projectile
-  (pushnew! projectile-globally-ignored-directories "*node_modules$"))
+  (pushnew! projectile-globally-ignored-directories "*node_modules"))
 
 
 ;;; :lang org
@@ -152,7 +144,7 @@
 
 
 ;;; :tools term
-(setq vterm-shell "/opt/homebrew/bin/fish")
+(setq vterm-shell (or (executable-find "fish") "/bin/sh"))
 
 
 ;;; :ui treemacs
